@@ -1,21 +1,24 @@
 
 const nodemailer = require('nodemailer');
-const creds = require('../config/config');
+// const creds = require('../config/config');
+require('dotenv').config();
 
+
+
+const transport = {
+    host: 'smtp.gmail.com', // SMTP host of provider
+    port: 587,
+    auth: {
+        user: process.env.USER,  
+        pass: process.env.PASS
+    }
+}
 
 module.exports = {
 
-    transport: {
-        host: 'smtp.gmail.com', // SMTP host of provider
-        port: 587,
-        auth: {
-            user: creds.USER,
-            pass: creds.PASS
-        }
-    },
-
     // Send and confirm status of email function
     sendMessage: function (body) {
+        return new Promise((resolve, reject) => {
 
         const firstName = body.firstName
         const lastName = body.lastName
@@ -33,18 +36,39 @@ module.exports = {
             subject: subject,
             text: message
         }
+        console.log("Data from generate-email")
         console.log("mail template")
         console.log(mail)
+        console.log("----------------")
+        console.log("transport object below")
+        console.log(transport.host)
+        console.log(transport.port)
+        console.log(transport.auth.user)
+        console.log(transport.auth.pass)
+        console.log("----------------")
 
         var transporter = nodemailer.createTransport(transport);
 
         transporter.sendMail(mail, (err, data) => {
+            console.log("in the transporter send mail ()")
+
             if (err) {
                 console.log('status: message failed to send')
+                resolve({
+                    "status":"error",
+                    "data": err
+                });
             } else {
                 console.log('status: success! \n This is the data sent: ' + data)
+                resolve({
+                    "status":"email sent",
+                    "data": data
+                });
             }
+
         })
+        resolve("Transporter did not happen");
+    })
     },
 
     // Auto-reply confirmation email to sender
