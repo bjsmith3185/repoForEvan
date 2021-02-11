@@ -1,6 +1,5 @@
 
 const nodemailer = require('nodemailer');
-// const creds = require('../config/config');
 require('dotenv').config();
 
 
